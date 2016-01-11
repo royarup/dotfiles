@@ -4,33 +4,32 @@
 [ -z "$PS1" ] && return
 
 function set_prompt(){
-      #Colors
-      #Reset
-      colorReset='\[\e[0m\]'       #Text Reset
-      # Bold Colors
-      bRed='\[\e[1;31m\]'         #Red
+   #Colors
+   #Reset
+   colorReset='\[\e[0m\]'       #Text Reset
+   # Bold Colors
+   bRed='\[\e[1;31m\]'         #Red
 
-      source ~/.git-prompt.sh
+   source ~/.git-prompt.sh
 
-      hostname=`hostname`
-      PS1="$hostname"
+   hostname=`hostname`
+   PS1="$hostname"
 
-      PS1+=" ["
+   PS1+=" ["
 
-      current_dir=`pwd`
-      PS1+="$current_dir"
+   current_dir=`pwd`
+   PS1+="$current_dir"
 
-      #Adding Info about git repo
-      git_info=`__git_ps1`
+   #Adding Info about git repo
+   git_info=`__git_ps1`
 
-      PS1+="$bRed$git_info$colorReset"
+   PS1+="$bRed$git_info$colorReset"
 
-      PS1+="]"
+   PS1+="]"
 
-      end_marker='$ '
+   end_marker='$ '
 
-      PS1+="$end_marker"
-   fi
+   PS1+="$end_marker"
 }
 
 PROMPT_COMMAND='set_prompt'
@@ -68,6 +67,7 @@ shopt -s autocd globstar checkjobs
 shopt -s cdspell
 
 # User specific aliases and functions
+alias vi="vim"
 alias ll="ls -l"
 alias la="ls -a"
 
