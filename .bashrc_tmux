@@ -1,0 +1,76 @@
+#tmux specific utility functions
+#Creates a new tmux session with the name of the workspace( might have the path )
+function _tmux_new(){
+   user=`whoami`
+   userHome="/home/$user"
+   #Input parameter might contain path
+   workspaceWithPath=$1
+   workspace=`basename "$1"`
+   cd "$workspaceWithPath"
+   tmux new-session -d -s "$workspace"
+   #Creating the layout
+   tmux send -t "$workspace.0" "tmux source-file ~/.tmux/init" ENTER
+   tmux attach -t "$workspace"
+}
+
+#Returns all tmux sessions that match with the pattern
+function _tmux_matched_session(){
+   if [ "$#" -ne 1 ]; then
+      matchedSessions=`tmux ls 2>/dev/null | cut -f1 -d':'`
+   else
+      matchedSessions=`tmux ls 2>/dev/null | cut -f1 -d':' | grep "$1"`
+   fi
+   echo "$matchedSessions"
+}
+#Attach to a running tmux session with a pattern. If there is no unique match,
+#it asks the user to select among the matches
+function _tmux_att(){
+   matchedSessions=`_tmux_matched_session $1`
+   if [ -z "$matchedSessions" ]; then
+      echo "No matched tmux sessions"
+   elif [  `echo "$matchedSessions" | wc -l` -eq 1 ]; then
+      echo "Matched exactly one session $matchedSessions"
+      tmux attach -t $matchedSessions
+   else
+      menu="Active tmux sessions"
+      query="Choose a session"
+      optionArray=()
+      for aSession in $matchedSessions; do
+         optionArray+=( "$aSession" "$aSession" )
+      done
+      default="${optionArray[0]}"
+      choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
+      if [ ! -z "$choice" ]; then
+         tmux attach -t "$choice"
+      fi
+   fi
+}
+#Kill a running tmux session with a pattern. If there is no unique match,
+#it asks the user to select among the matches
+function _tmux_kill(){
+   matchedSessions=`_tmux_matched_session $1`
+   choice=""
+   if [ -z "$matchedSessions" ]; then
+      echo "No matched tmux sessions"
+      return
+   elif [  `echo "$matchedSessions" | wc -l` -eq 1 ]; then
+      echo "Matched exactly one session $matchedSessions"
+      choice="$matchedSessions"
+   else
+      menu="Active tmux sessions"
+      query="Choose a session"
+      optionArray=()
+      for aSession in $matchedSessions; do
+         optionArray+=( "$aSession" "$aSession" )
+      done
+      default="${optionArray[0]}"
+      choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
+   fi
+   if [ ! -z "$choice" ]; then
+      echo -n "Do you want to kill $choice (y/n)? "
+      read answer
+      if echo "$answer" | grep -iq "^y" ;then
+         tmux kill-session -t "$choice"
+      fi
+   fi
+}

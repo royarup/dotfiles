@@ -1,0 +1,177 @@
+# Additional customizations to Bash
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+function set_prompt(){
+      #Colors
+      #Reset
+      colorReset='\[\e[0m\]'       #Text Reset
+      # Bold Colors
+      bRed='\[\e[1;31m\]'         #Red
+
+      source ~/.git-prompt.sh
+
+      hostname=`hostname`
+      PS1="$hostname"
+
+      PS1+=" ["
+
+      current_dir=`pwd`
+      PS1+="$current_dir"
+
+      #Adding Info about git repo
+      git_info=`__git_ps1`
+
+      PS1+="$bRed$git_info$colorReset"
+
+      PS1+="]"
+
+      end_marker='$ '
+
+      PS1+="$end_marker"
+   fi
+}
+
+PROMPT_COMMAND='set_prompt'
+
+stty -ixon
+
+#Set Vim as default editor
+export EDITOR=vim
+
+#Use bash as Vi mode
+set -o vi
+
+#Disable Ctrl+s and Ctrl-q
+stty stop ''
+stty start ''
+stty -ixon
+stty -ixoff
+
+# Save multiple-line command together
+shopt -s cmdhist
+
+# don't put duplicate lines in the history.
+export HISTCONTROL=ignoredups
+
+# Huge history
+#export HISTSIZE=1000000
+
+# Ignore a few specified commands
+export HISTIGNORE=ls:'ls -l':fg:up
+
+# Bash 4 features
+shopt -s autocd globstar checkjobs
+
+# for example, cd /vr/lgo/apaache would find /var/log/apache
+shopt -s cdspell
+
+# User specific aliases and functions
+alias ll="ls -l"
+alias la="ls -a"
+
+#Bash utility functions
+#show window
+function chooseFrom(){
+   title="${1}"
+   shift
+   query="${1}"
+   shift
+   default="${1}"
+   shift
+   optionArray=("${@}")
+   session=$(whiptail --default-item "$default" --clear --title "$title" --menu "$query"\
+      20 120 10 "${optionArray[@]}" 3>&1 1>&2 2>&3)
+   exitstatus=$?
+   choice=""
+   if [ $exitstatus = 0 ]; then
+      choice="$session"
+   fi
+   echo "$choice"
+}
+
+#Find File
+#Suppresses the errors ( e.g.- File permissions )
+function _ff(){
+   directory=$1
+   pattern=$2
+   matchedFiles=`find "$directory" -name "$pattern" 2>/dev/null`
+   if [ ! -z "$matchedFiles" ]; then
+      menu="Matched files"
+      query="Choose a file"
+      optionArray=()
+      for aFile in ${matchedFiles}; do
+         optionArray+=( "$aFile" `basename "$aFile" `)
+      done
+      default="${optionArray[0]}"
+      while true; do
+         choice=""
+         choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
+         if [ -z "$choice" ]; then
+            break
+         fi
+         default="$choice"
+         fileSelected=`echo "$choice"`
+         vi "$fileSelected"
+      done
+   fi
+}
+#Grep recursive
+function _gr(){
+   pattern="$1"
+   directory="$2"
+   grep -nRH "$pattern" "$directory" 2>/dev/null
+}
+#Grep recursive case insensitive
+function _gri(){
+   pattern="$1"
+   directory="$2"
+   grep -nRHi "$pattern" "$directory" 2>/dev/null
+}
+#Choose from a list of matched files
+function _go_generic(){
+   matchedFiles="$1"
+   if [ ! -z "$matchedFiles" ]; then
+      menu="Mathced files"
+      query="Choose a file"
+      optionArray=()
+      OIFS="${IFS}"
+      NIFS=$'\n'
+      IFS="${NIFS}"
+      for aFile in ${matchedFiles}; do
+         IFS="${OIFS}"
+         fileName=`echo "$aFile" | cut -f-2 -d':'`
+         content=`echo "$aFile" | cut -f3- -d':'`
+         optionArray+=( "$fileName" "$content" )
+         IFS="${NIFS}"
+      done
+      IFS="${OIFS}"
+      default="${optionArray[0]}"
+      while true; do
+         choice=""
+         choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
+         if [ -z "$choice" ]; then
+            break
+         fi
+         default="$choice"
+         fileSelected=`echo "$choice" | cut -f1 -d':'`
+         lineNumber=`echo "$choice" | cut -f2 -d':'`
+         vi $fileSelected +$lineNumber
+      done
+   fi
+}
+#Lists the files matching a case-insensitive pattern
+function _goi(){
+   pattern="$1"
+   directory="$2"
+   matchedFiles=`_gri "$pattern" "$directory"`
+   _go_generic "$matchedFiles"
+}
+#Lists the files matching a case-sensitive pattern
+function _go(){
+   pattern="$1"
+   directory="$2"
+   matchedFiles=`_gr "$pattern" "$directory"`
+   _go_generic "$matchedFiles"
+}

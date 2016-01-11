@@ -1,0 +1,6 @@
+rename-window vim
+source-file ~/.tmux/vim
+new-window
+rename-window bash
+source-file ~/.tmux/bash
+select-window -t 0
