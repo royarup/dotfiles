@@ -147,11 +147,6 @@ command InsComment :normal A<CR><CR>#<<<ARUP: COMMENT<CR>#<<<ARUP: END COMMENT<C
 "Plugins customization
 "
 
-"Set ctags
-if !empty( $A4_CHROOT )
-   set tags=/src/tags
-endif
-
 "Setting the fold color for AGid
 let AGid_Hi_Fold = 'cterm=bold ctermbg=black ctermfg=white'
 
