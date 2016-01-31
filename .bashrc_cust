@@ -4,33 +4,30 @@
 [ -z "$PS1" ] && return
 
 function set_prompt(){
-      #Colors
-      #Reset
-      colorReset='\[\e[0m\]'       #Text Reset
-      # Bold Colors
-      bRed='\[\e[1;31m\]'         #Red
+   #Colors
+   #Reset
+   colorReset='\[\e[0m\]'       #Text Reset
+   # Bold Colors
+   bRed='\[\e[1;31m\]'         #Red
+   bBlue='\[\e[1;34m\]'        #Blue
 
-      source ~/.git-prompt.sh
+   PS1=""
 
-      hostname=`hostname`
-      PS1="$hostname"
+   #Adding current dir
+   PS1+="\w"
 
-      PS1+=" ["
-
-      current_dir=`pwd`
-      PS1+="$current_dir"
-
-      #Adding Info about git repo
-      git_info=`__git_ps1`
-
+   #Adding Info about git repo
+   source ~/.git-prompt.sh
+   git_info=`__git_ps1`
+   if [ ! -z "$git_info" ]; then
       PS1+="$bRed$git_info$colorReset"
-
-      PS1+="]"
-
-      end_marker='$ '
-
-      PS1+="$end_marker"
    fi
+
+   hostname=`hostname`
+   PS1+="$bBlue @$hostname$colorReset"
+
+   end_marker='> '
+   PS1+="$end_marker"
 }
 
 PROMPT_COMMAND='set_prompt'
