@@ -89,13 +89,6 @@ set clipboard+=unnamed
 "All three file formats
 set fileformats=unix,dos,mac
 
-
-"Disable arrow keys
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
-
 "Line break from the cursor position, deletes space if it's under cursor
 nnoremap K :call LineBreak()<CR>
 function! LineBreak()
