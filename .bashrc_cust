@@ -3,6 +3,8 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+source ~/git-completion.bash
+
 function set_prompt(){
    #Colors
    #Reset
