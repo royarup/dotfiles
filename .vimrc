@@ -3,12 +3,26 @@
    source /etc/vimrc
 :endif
 
-" Include Arista-specific settings
-:if filereadable( $VIM . "/vimfiles/arista.vim" )
-   source $VIM/vimfiles/arista.vim
-:endif
+" Installing Vim-Plug if it's not available
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
-"Setting the syntax highlighting
+" Plugins via Vim-Plug
+call plug#begin()
+Plug 'morhetz/gruvbox'
+Plug 'bitc/vim-bad-whitespace'
+Plug 'tpope/vim-fugitive'
+Plug 'gregsexton/gitv'
+Plug 'szw/vim-maximizer'
+Plug 'derekwyatt/vim-fswitch'
+Plug 'godlygeek/tabular'
+Plug 'majutsushi/tagbar'
+call plug#end()
+
+" Color scheme
 syntax on
 set background=dark
 colorscheme gruvbox
@@ -19,16 +33,16 @@ let g:gruvbox_invert_selection=0
    let g:gruvbox_italic=0
 :endif
 
-"Set the filename always visible
+" Start editor setup
+" Set the filename always visible
 set laststatus=2
-"Change the status bar
+" Change the status bar
 set statusline=
 set statusline+=%4*\ %<%F%*            "full path
 set statusline+=%2*%m%*                "modified flag
 set statusline+=%1*%=%5l%*             "current line
 set statusline+=%2*/%L%*               "total lines
 set statusline+=%1*%4v\ %*             "virtual column number
-
 "Show line number
 set number
 set numberwidth=4
@@ -58,17 +72,17 @@ set tabstop=8
 highlight ColorColumn ctermbg=gray
 set colorcolumn=86
 
-"Don't make noise
+" Don't make noise
 set noerrorbells
-"Turn on command line completion wild style
+" Turn on command line completion wild style
 set wildmenu
-"Ignore these list file extensions
+" Ignore these list file extensions
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,
                \*.jpg,*.gif,*.png
-"Turn on wild mode huge list
+" Turn on wild mode huge list
 set wildmode=list:longest
 
-"Load filetype plugins/indent settings
+" Load filetype plugins/indent settings
 filetype plugin indent on
 "Always switch to the current file directory
 set autochdir
@@ -76,14 +90,7 @@ set autochdir
 set backspace=indent,eol,start
 "Make backup files
 set backup
-"Where to put backup and swap files
-if !empty( $A4_CHROOT )
-   set backupdir=/tmp/.vim/backup
-   set directory=/tmp/.vim/swap
-else
-   set backupdir=~/.vim/backup
-   set directory=~/.vim/swap
-endif
+
 "Share windows clipboard
 set clipboard+=unnamed
 "All three file formats
@@ -104,63 +111,32 @@ map <C-j> <C-w>j
 map <C-k> <C-w>k
 map <C-h> <C-w>h
 map <C-l> <C-w>l
-noremap <C-m> :call MaximizeToggle()<CR>
-function! MaximizeToggle()
-  if exists("s:maximize_session")
-    exec "source " . s:maximize_session
-    call delete(s:maximize_session)
-    unlet s:maximize_session
-    let &hidden=s:maximize_hidden_save
-    unlet s:maximize_hidden_save
-  else
-    let s:maximize_hidden_save = &hidden
-    let s:maximize_session = tempname()
-    set hidden
-    exec "mksession! " . s:maximize_session
-    only
-  endif
-endfunction
+
+" Key mapping for maximizing current vim window
+noremap <C-m> :MaximizerToggle<CR>
 
 "No indent when pasting
-"Press \p before pasting
+"Press  before pasting
 nnoremap <leader>p :set invpaste paste?<CR>
 set pastetoggle=<leader>p
 set showmode
 
-"Highlight current line and column
-"Toggle with \c
-:hi CursorLine   cterm=NONE ctermbg=gray ctermfg=white
-:hi CursorColumn cterm=NONE ctermbg=gray ctermfg=white
-:nnoremap <Leader>c :set cursorline! cursorcolumn!<CR>
+" Automatically diffupdate on write
+autocmd BufWritePost * if &diff == 1 | diffupdate | endif
 
-"Insert a comment blocks
-command InsDebug :normal A<CR><CR>#<<<ARUP: DEBUG<CR>import Tac<CR>Tac.pdb()<CR>#<<<ARUP: END DEBUG<CR><ESC>
-command InsComment :normal A<CR><CR>#<<<ARUP: COMMENT<CR>#<<<ARUP: END COMMENT<CR><ESC>
+" Search visually selected word
+vnoremap n y/<C-R>"<CR>
 
-"Plugins customization
-"
-
-"Setting the fold color for AGid
-let AGid_Hi_Fold = 'cterm=bold ctermbg=black ctermfg=white'
-
-"Custom setting for python_fn
-"Remapping go to start of block
-map ]b :PBoB<CR>
-vmap ]b :<C-U>PBOB<CR>m'gv``
-
-"Remapping jump to previous class
-map  ]P   :call PythonDec( "class", -1 )<CR>
-vmap ]P   :call PythonDec( "class", -1 )<CR>
-
-"Rempping jump to next class
-map  ]N   :call PythonDec( "class", 1 )<CR>
-vmap ]N   :call PythonDec( "class", 1 )<CR>
-
-"Rempping jump to previous function
-map  ]p   :call PythonDec( "function", -1 )<CR>
-vmap ]p   :call PythonDec( "function", -1 )<CR>
-
-"Rempping jump to next function
-map  ]n   :call PythonDec( "function", 1 )<CR>
-vmap ]n   :call PythonDec( "function", 1 )<CR>
-
+" Tagbar plugin
+noremap <Leader>tb :TagbarToggle<CR>
+let g:tagbar_compact = 1
+let g:tagbar_autofocus = 1
+let g:tagbar_sort = 0
+let g:tagbar_left = 1
+let g:tagbar_type_tac = {
+   \ 'ctagstype' : 'tacc',
+   \ 'kinds'     : [
+       \ 'd:definition'
+   \ ],
+   \ 'sort'    : 0
+\ }

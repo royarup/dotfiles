@@ -1,0 +1,17 @@
+[core]
+        excludesfile = /home/arup/.gitignore_global
+[user]
+        name = Arup Raton Roy
+        email = roy.arup@gmail.com
+[diff]
+        tool = vimdiff
+[alias]
+        dt = difftool
+        hist = log --oneline --branches --abbrev-commit --graph --decorate --color
+        dm = diff master
+        fc = diff master --name-only
+
+[pager]
+        show = vim -c '%sm/\\e.\\{-}m//g' -c 'set ft=diff' +1 -
+[mergetool]
+        keepBackup = false

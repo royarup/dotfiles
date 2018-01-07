@@ -89,87 +89,15 @@ function chooseFrom(){
    echo "$choice"
 }
 
-#Find File
-#Suppresses the errors ( e.g.- File permissions )
-function _ff(){
-   directory=$1
-   pattern=$2
-   matchedFiles=`find "$directory" -name "$pattern" 2>/dev/null`
-   if [ ! -z "$matchedFiles" ]; then
-      menu="Matched files"
-      query="Choose a file"
-      optionArray=()
-      for aFile in ${matchedFiles}; do
-         optionArray+=( "$aFile" `basename "$aFile" `)
-      done
-      default="${optionArray[0]}"
-      while true; do
-         choice=""
-         choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
-         if [ -z "$choice" ]; then
-            break
-         fi
-         default="$choice"
-         fileSelected=`echo "$choice"`
-         vi "$fileSelected"
-      done
-   fi
-}
 #Grep recursive
 function _gr(){
-   pattern="$1"
-   directory="$2"
-   grep -nRH "$pattern" "$directory" 2>/dev/null
+   pattern=$1
+   directory=$2
+   grep -nRH $pattern $directory 2>/dev/null
 }
 #Grep recursive case insensitive
 function _gri(){
-   pattern="$1"
-   directory="$2"
-   grep -nRHi "$pattern" "$directory" 2>/dev/null
-}
-#Choose from a list of matched files
-function _go_generic(){
-   matchedFiles="$1"
-   if [ ! -z "$matchedFiles" ]; then
-      menu="Mathced files"
-      query="Choose a file"
-      optionArray=()
-      OIFS="${IFS}"
-      NIFS=$'\n'
-      IFS="${NIFS}"
-      for aFile in ${matchedFiles}; do
-         IFS="${OIFS}"
-         fileName=`echo "$aFile" | cut -f-2 -d':'`
-         content=`echo "$aFile" | cut -f3- -d':'`
-         optionArray+=( "$fileName" "$content" )
-         IFS="${NIFS}"
-      done
-      IFS="${OIFS}"
-      default="${optionArray[0]}"
-      while true; do
-         choice=""
-         choice=$( chooseFrom "$menu" "$query" "$default" "${optionArray[@]}" )
-         if [ -z "$choice" ]; then
-            break
-         fi
-         default="$choice"
-         fileSelected=`echo "$choice" | cut -f1 -d':'`
-         lineNumber=`echo "$choice" | cut -f2 -d':'`
-         vi $fileSelected +$lineNumber
-      done
-   fi
-}
-#Lists the files matching a case-insensitive pattern
-function _goi(){
-   pattern="$1"
-   directory="$2"
-   matchedFiles=`_gri "$pattern" "$directory"`
-   _go_generic "$matchedFiles"
-}
-#Lists the files matching a case-sensitive pattern
-function _go(){
-   pattern="$1"
-   directory="$2"
-   matchedFiles=`_gr "$pattern" "$directory"`
-   _go_generic "$matchedFiles"
+   pattern=$1
+   directory=$2
+   grep -nRHi $pattern $directory 2>/dev/null
 }
