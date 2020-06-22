@@ -27,6 +27,7 @@ Plug 'rhysd/conflict-marker.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'tmux-plugins/vim-tmux-focus-events'
 Plug 'mox-mox/vim-localsearch'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 call plug#end()
 
 " Color scheme

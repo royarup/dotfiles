@@ -4,7 +4,7 @@
 [ -z "$PS1" ] && return
 
 export PATH=/home/arup/softwares/bin:$PATH
-
+export PATH=/home/arup/go/bin:$PATH
 source ~/git-completion.bash
 
 function set_prompt(){
