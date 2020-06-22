@@ -20,6 +20,13 @@ Plug 'szw/vim-maximizer'
 Plug 'derekwyatt/vim-fswitch'
 Plug 'godlygeek/tabular'
 Plug 'majutsushi/tagbar'
+Plug 'jstemmer/gotags'
+Plug 'rhysd/git-messenger.vim'
+Plug 'rhysd/accelerated-jk'
+Plug 'rhysd/conflict-marker.vim'
+Plug 'vim-airline/vim-airline'
+Plug 'tmux-plugins/vim-tmux-focus-events'
+Plug 'mox-mox/vim-localsearch'
 call plug#end()
 
 " Color scheme
@@ -115,6 +122,8 @@ map <C-l> <C-w>l
 " Key mapping for maximizing current vim window
 noremap <C-m> :MaximizerToggle<CR>
 
+noremap <C-q> :%s/\s\+$//e<CR>
+
 "No indent when pasting
 "Press  before pasting
 nnoremap <leader>p :set invpaste paste?<CR>
@@ -133,10 +142,38 @@ let g:tagbar_compact = 1
 let g:tagbar_autofocus = 1
 let g:tagbar_sort = 0
 let g:tagbar_left = 1
-let g:tagbar_type_tac = {
-   \ 'ctagstype' : 'tacc',
-   \ 'kinds'     : [
-       \ 'd:definition'
-   \ ],
-   \ 'sort'    : 0
+let g:go_auto_type_info=0
+let g:tagbar_type_go = {
+        \ 'ctagstype' : 'go',
+        \ 'kinds'     : [
+                \ 'p:package',
+                \ 'i:imports:1',
+                \ 'c:constants',
+                \ 'v:variables',
+                \ 't:types',
+                \ 'n:interfaces',
+                \ 'w:fields',
+                \ 'e:embedded',
+                \ 'm:methods',
+                \ 'r:constructor',
+                \ 'f:functions'
+        \ ],
+        \ 'sro' : '.',
+        \ 'kind2scope' : {
+                \ 't' : 'ctype',
+                \ 'n' : 'ntype'
+        \ },
+        \ 'scope2kind' : {
+                \ 'ctype' : 't',
+                \ 'ntype' : 'n'
+        \ },
+        \ 'ctagsbin'  : 'gotags',
+        \ 'ctagsargs' : '-sort -silent'
 \ }
+
+" Airline status specific setup
+let g:airline#extensions#tagbar#flags = 'f'
+let g:airline#extensions#localsearch#enabled = 1
+
+" Local search
+nmap <leader>/ <Plug>localsearch_toggle

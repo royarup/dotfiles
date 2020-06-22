@@ -3,6 +3,8 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+export PATH=/home/arup/softwares/bin:$PATH
+
 source ~/git-completion.bash
 
 function set_prompt(){
@@ -67,7 +69,7 @@ shopt -s autocd globstar checkjobs
 shopt -s cdspell
 
 # User specific aliases and functions
-alias vi="vim"
+alias vi="nvim"
 alias ll="ls -l"
 alias la="ls -a"
 
