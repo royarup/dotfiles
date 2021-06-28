@@ -69,6 +69,8 @@ shopt -s autocd globstar checkjobs
 shopt -s cdspell
 
 # User specific aliases and functions
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
 alias vi="nvim"
 alias ll="ls -l"
 alias la="ls -a"
